@@ -31,7 +31,7 @@ function star(x, y, radius, color) {
   this.radius = radius;
   this.color = color;
   this.velocity = {
-    x: 0,
+    x: randomIntFromRange(-5, 5),
     y: 3
   };
   this.gravity = 1;
@@ -39,24 +39,38 @@ function star(x, y, radius, color) {
 }
 
 star.prototype.draw = function() {
+  ctx.save();
   ctx.beginPath();
   ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
   ctx.fillStyle = this.color;
+  ctx.shadowColor = "#E3EAEF";
+  ctx.shadowBlur = 20;
   ctx.fill();
   ctx.closePath();
+  ctx.restore();
 };
 
 star.prototype.update = function() {
   this.draw();
 
   //when ball hits bottom of screen
-  if (this.y + this.radius + this.velocity.y > canvas.height) {
+  if (this.y + this.radius + this.velocity.y > canvas.height - groundHeight) {
     this.velocity.y = -this.velocity.y * this.friction;
     this.shatter();
   } else {
     this.velocity.y += this.gravity;
   }
 
+  //whan ball hits side of screen
+  if (
+    this.x + this.radius + this.velocity.x > canvas.width ||
+    this.x - this.radius <= 0
+  ) {
+    this.velocity.x = -this.velocity.x * this.friction;
+    this.shatter();
+  }
+
+  this.x += this.velocity.x;
   this.y += this.velocity.y;
 };
 
@@ -84,18 +98,22 @@ function miniStar(x, y, radius, color) {
 }
 
 miniStar.prototype.draw = function() {
+  ctx.save();
   ctx.beginPath();
   ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-  ctx.fillStyle = `rgba(255, 0, 0, ${this.opacity})`;
+  ctx.fillStyle = `rgba(227, 234, 239, ${this.opacity})`;
+  ctx.shadowColor = "#E3EAEF";
+  ctx.shadowBlur = 20;
   ctx.fill();
   ctx.closePath();
+  ctx.restore();
 };
 
 miniStar.prototype.update = function() {
   this.draw();
 
   //when ball hits bottom of screen
-  if (this.y + this.radius + this.velocity.y > canvas.height) {
+  if (this.y + this.radius + this.velocity.y > canvas.height - groundHeight) {
     this.velocity.y = -this.velocity.y * this.friction;
   } else {
     this.velocity.y += this.gravity;
@@ -127,12 +145,25 @@ backgroundGradient.addColorStop(1, "#3F586B");
 
 let stars;
 let miniStars;
+let backgroundStars;
+let ticker = 0;
+let randomSpawnRate = 75;
+let groundHeight = 100;
+
 function init() {
   stars = [];
   miniStars = [];
+  backgroundStars = [];
 
-  for (let i = 0; i < 1; i++) {
-    stars.push(new star(canvas.width / 2, 30, 30, "blue"));
+  // for (let i = 0; i < 1; i++) {
+  //   stars.push(new star(canvas.width / 2, 30, 30, "#E3EAEF"));
+  // }
+
+  for (let i = 0; i < 150; i++) {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    const radius = Math.random() * 3;
+    backgroundStars.push(new star(x, y, radius, "white"));
   }
 }
 
@@ -142,9 +173,16 @@ function animate() {
 
   ctx.fillStyle = backgroundGradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  backgroundStars.forEach(backgroundStar => {
+    backgroundStar.draw();
+  });
+
   createMountainRange(1, canvas.height - 200, "#384551");
   createMountainRange(2, canvas.height - 300, "#2B3843");
   createMountainRange(3, canvas.height - 400, "#26333E");
+  ctx.fillStyle = "#182028";
+  ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
 
   stars.forEach((star, index) => {
     star.update();
@@ -159,6 +197,14 @@ function animate() {
       miniStars.splice(index, 1);
     }
   });
+
+  ticker++;
+  if (ticker % randomSpawnRate == 0) {
+    const radius = 12;
+    const x = Math.max(radius, Math.random() * canvas.width - radius);
+    stars.push(new star(x, -100, radius, "white"));
+    randomSpawnRate = randomIntFromRange(75, 200);
+  }
 }
 
 init();
