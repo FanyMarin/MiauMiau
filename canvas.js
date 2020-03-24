@@ -1,12 +1,11 @@
-// import {randomIntFromRange, randomColor, distance} from "./utils.js"
-
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
+let audio = new Audio();
+audio.src = "./music/clair-de-lune.mp3";
+audio.loop = true;
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-
-const colors = ["#2185C5", "#7ECEFD", "#FFF6E5", "FF7F66"];
 
 //helper functions
 function randomIntFromRange(min, max) {
@@ -155,10 +154,6 @@ function init() {
   miniStars = [];
   backgroundStars = [];
 
-  // for (let i = 0; i < 1; i++) {
-  //   stars.push(new star(canvas.width / 2, 30, 30, "#E3EAEF"));
-  // }
-
   for (let i = 0; i < 150; i++) {
     const x = Math.random() * canvas.width;
     const y = Math.random() * canvas.height;
@@ -205,6 +200,12 @@ function animate() {
     stars.push(new star(x, -100, radius, "white"));
     randomSpawnRate = randomIntFromRange(75, 200);
   }
+
+  //Text on canvas
+  var imagen = new Image();
+  imagen.src = './Images/quoteBold.png';
+  ctx.drawImage(imagen, canvas.width/1.2-canvas.width/1.4,canvas.height/4,canvas.width/1.4,canvas.height/2);
+  
 }
 
 init();
