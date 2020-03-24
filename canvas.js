@@ -203,10 +203,24 @@ function animate() {
 
   //Text on canvas
   var imagen = new Image();
-  imagen.src = './Images/quoteBold.png';
-  ctx.drawImage(imagen, canvas.width/1.2-canvas.width/1.4,canvas.height/4,canvas.width/1.4,canvas.height/2);
-  
+  imagen.src = "./Images/quoteBold.png";
+  ctx.drawImage(
+    imagen,
+    canvas.width / 1.2 - canvas.width / 1.4,
+    canvas.height / 4,
+    canvas.width / 1.4,
+    canvas.height / 2
+  );
 }
+
+//To play the music
+
+addEventListener("keydown", event => {
+  const playAudio = 32;
+  if (event.keyCode === playAudio) {
+    audio.play();
+  }
+});
 
 init();
 animate();
